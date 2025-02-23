@@ -1,0 +1,28 @@
+<style>
+    /* Обновленные стили для кнопки удаления */
+    .delete-btn {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: #ff4444;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: opacity 0.3s;
+        z-index: 2;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .delete-btn:hover {
+        background: #cc0000;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .product-card {
+        position: relative;
+        padding-bottom: 50px; /* Добавляем место для кнопки */
+    }
+</style>

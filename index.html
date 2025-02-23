@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интернет-магазин</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+        }
+
+        .nav-sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-category {
+            list-style: none;
+            padding: 20px 0 0 0;
+            margin: 0;
+        }
+
+        .nav-category li {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .nav-category li:hover {
+            background: #f0f0f0;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 270px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .category-select {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 14px;
+            z-index: 2;
+            max-width: 200px;
+        }
+
+        .image-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .nav-arrows {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .image-container:hover .nav-arrows {
+            opacity: 1;
+        }
+
+        .arrow-btn {
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            pointer-events: all;
+        }
+
+        .editable-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .edit-btn:hover {
+            color: #2196F3;
+        }
+
+        [contenteditable="true"] {
+            border-bottom: 1px dashed #999;
+            outline: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .site-link {
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .upload-label {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-product-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .price-field::before {
+            content: "¥ ";
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-sidebar">
+        <ul class="nav-category">
+            <li onclick="showAllProducts()">Главная</li>
+            <li onclick="filterProducts('Головные уборы')">Головные уборы</li>
+            <li onclick="filterProducts('Футболки/Майки')">Футболки/Майки</li>
+            <li onclick="filterProducts('Худи/Зипки')">Худи/Зипки</li>
+            <li onclick="filterProducts('Верх')">Верх</li>
+            <li onclick="filterProducts('Куртки')">Куртки</li>
+            <li onclick="filterProducts('Низ')">Низ</li>
+            <li onclick="filterProducts('Обувь')">Обувь</li>
+            <li onclick="filterProducts('Аксессуары')">Аксессуары</li>
+            <li onclick="filterProducts('Электроника')">Электроника</li>
+            <li onclick="filterProducts('Безделушки')">Безделушки</li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <button class="add-product-btn" onclick="addNewProduct()">＋ Добавить товар</button>
+        
+        <div class="container" id="productsContainer">
+            <div class="product-card" style="display: none;">
+                <select class="category-select">
+                    <option>Головные уборы</option>
+                    <option>Футболки/Майки</option>
+                    <option>Худи/Зипки</option>
+                    <option>Верх</option>
+                    <option>Куртки</option>
+                    <option>Низ</option>
+                    <option>Обувь</option>
+                    <option>Аксессуары</option>
+                    <option>Электроника</option>
+                    <option>Безделушки</option>
+                </select>
+
+                <div class="image-container">
+                    <img src="https://via.placeholder.com/800x250" class="product-image" alt="Товар">
+                    <div class="nav-arrows">
+                        <button class="arrow-btn" onclick="changeImage(this, -1)">❮</button>
+                        <button class="arrow-btn" onclick="changeImage(this, 1)">❯</button>
+                    </div>
+                    <label class="upload-label">
+                        📷 Загрузить (макс. 5)
+                        <input type="file" accept="image/*" multiple hidden 
+                               onchange="handleUpload(this)">
+                    </label>
+                </div>
+
+                <div class="editable-field">
+                    <h1 contenteditable="false">Новый товар</h1>
+                    <button class="edit-btn" onclick="toggleEdit(this)">🖌️</button>
+                </div>
+
+                <div class="editable-field">
+                    <p class="price-field" contenteditable="false">0.00</p>
+                    <button class="edit-btn" onclick="toggleEdit(this)">🖌️</button>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="#" class="site-link">Перейти на сайт</a>
+                    <button class="edit-btn" onclick="editLink(this)">🖌️</button>
+                </div>
+
+                <button class="delete-btn" onclick="deleteProduct(this)">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const template = document.querySelector('.product-card');
+        const container = document.getElementById('productsContainer');
+        template.remove();
+
+        function addNewProduct() {
+            const newProduct = template.cloneNode(true);
+            newProduct.dataset.created = Date.now();
+            newProduct.style.display = 'block';
+            newProduct.querySelector('h1').textContent = 'Новый товар';
+            newProduct.querySelector('.price-field').textContent = '0.00';
+            newProduct.querySelector('.product-image').src = 'https://via.placeholder.com/800x250';
+            newProduct.querySelector('input[type="file"]').value = '';
+            newProduct.querySelector('.category-select').selectedIndex = 0;
+            container.prepend(newProduct);
+        }
+
+        function handleUpload(input) {
+            if (input.files.length > 5) {
+                alert('Максимально 5 изображений!');
+                input.value = '';
+                return;
+            }
+
+            const container = input.closest('.image-container');
+            const images = Array.from(input.files).map(file => URL.createObjectURL(file));
+            container.dataset.images = JSON.stringify(images);
+            container.dataset.currentIndex = 0;
+            updateImageDisplay(container);
+        }
+
+        function changeImage(btn, direction) {
+            const container = btn.closest('.image-container');
+            const images = JSON.parse(container.dataset.images || '[]');
+            if(images.length < 2) return;
+
+            let currentIndex = parseInt(container.dataset.currentIndex || 0);
+            currentIndex = (currentIndex + direction + images.length) % images.length;
+            container.dataset.currentIndex = currentIndex;
+            updateImageDisplay(container);
+        }
+
+        function updateImageDisplay(container) {
+            const images = JSON.parse(container.dataset.images || '[]');
+            const index = parseInt(container.dataset.currentIndex || 0);
+            if(images.length > 0) {
+                container.querySelector('.product-image').src = images[index];
+            }
+        }
+
+        function toggleEdit(btn) {
+            const field = btn.previousElementSibling;
+            field.contentEditable = field.contentEditable === 'true' ? 'false' : 'true';
+            if(field.contentEditable === 'true') field.focus();
+        }
+
+        function editLink(btn) {
+            const link = btn.previousElementSibling;
+            const newUrl = prompt('Введите новый URL:', link.href);
+            if(newUrl) {
+                link.href = newUrl.startsWith('http') ? newUrl : `https://${newUrl}`;
+            }
+        }
+
+        function deleteProduct(btn) {
+            const products = document.querySelectorAll('.product-card');
+            if(products.length > 1) {
+                btn.closest('.product-card').remove();
+            } else {
+                alert('Должен остаться хотя бы один товар!');
+            }
+        }
+
+        function filterProducts(category) {
+            const products = document.querySelectorAll('.product-card');
+            products.forEach(product => {
+                const productCategory = product.querySelector('.category-select').value;
+                product.style.display = (productCategory === category) ? 'block' : 'none';
+            });
+        }
+
+        function showAllProducts() {
+            const products = document.querySelectorAll('.product-card');
+            products.forEach(product => product.style.display = 'block');
+        }
+
+        addNewProduct();
+    </script>
+</body>
+</html>
